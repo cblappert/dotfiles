@@ -1,0 +1,16 @@
+[user]
+  name = Chris Blappert
+  email = blappert@fb.com
+[alias]
+	lgb = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset%n' --abbrev-commit --date=relative --branches
+  st = status
+  co = checkout
+[push]
+	default = matching
+[core]
+	excludesfile = /Users/blappert/.global_ignore
+  editor = vim
+[format]
+  pretty = full
+[log]
+  decorate

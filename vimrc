@@ -4,14 +4,16 @@ filetype off                  " required
 " Initialize VimPlug
 " ----------------------------------
 call plug#begin('~/.vim/bundle')
+" Vim Plug
 Plug 'bling/vim-airline'
 Plug 'altercation/vim-colors-solarized'
 Plug 'kien/ctrlp.vim'
 Plug 'vim-airline/vim-airline-themes'
 " Plug 'vim-syntastic/syntastic'
-" Plug 'craigemery/vim-autotag'
-" Plug 'flowtype/vim-flow'
+Plug 'craigemery/vim-autotag'
+Plug 'flowtype/vim-flow'
 call plug#end()
+
 
 " Now Perform The Installation Check:
 " ----------------------------------
@@ -25,18 +27,18 @@ else
     \| endif
 endif
 
+let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
 
 " set colors
 syntax enable
 set background=dark
 colorscheme solarized
+
 " AirlineTheme solarized if refresh needed
 let g:airline_solarized_bg='dark'
 
 " Airline
 " show open buffers
-" let g:airline#extensions#tabline#enabled = 1
-" let g:airline#extensions#tabline#fnamemod = ':t'
 
 " ctrlp
 let g:ctrlp_match_window = 'bottom,order:ttb'
@@ -58,15 +60,15 @@ nnoremap <C-h> :bprevious<CR>
 nmap <leader>bq :bp <BAR> bd #<cr>
 
 " syntastic
-"set statusline+=%#warningmsg#
-"set statusline+=%{SyntasticStatuslineFlag()}
-"set statusline+=%*
-"let g:syntastic_javascript_checkers = ['eslint', 'flow']
+" set statusline+=%#warningmsg#
+" set statusline+=%{SyntasticStatuslineFlag()}
+" set statusline+=%*
+" let g:syntastic_javascript_checkers = ['eslint', 'flow']
 
-"let g:syntastic_always_populate_loc_list = 1
-"let g:syntastic_auto_loc_list = 1
-"let g:syntastic_check_on_open = 0
-"let g:syntastic_check_on_wq = 0
+" let g:syntastic_always_populate_loc_list = 1
+" let g:syntastic_auto_loc_list = 1
+" let g:syntastic_check_on_open = 0
+" let g:syntastic_check_on_wq = 0
 
 " tab config
 set shiftwidth=2 " the distance to shift text when using < and >

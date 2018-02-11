@@ -35,9 +35,3 @@ export FBANDROID=/Users/blappert/fbsource/fbandroid
 export FBANDROID_DIR=/Users/blappert/data/fbsource/fbandroid
 export PATH="/usr/local/opt/icu4c/bin:$PATH"
 export PATH="/usr/local/opt/icu4c/sbin:$PATH"
-
-# BEGIN: Block added by chef, to set environment strings
-# Please see https://fburl.com/AndroidProvisioning if you do not use bash
-# or if you would rather this bit of code 'live' somewhere else
-. ~/.fbchef/environment
-# END: Block added by chef

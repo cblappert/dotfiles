@@ -1,4 +1,8 @@
 # .bashrc
+# Unlike earlier versions, Bash4 sources your bashrc on non-interactive shells.
+# The line below prevents anything in this file from creating output that will
+# break utilities that use ssh as a pipe, including git and mercurial.
+[ -z "$PS1" ] && return
 
 # for vim coloring to work properly
 export CLICOLOR=1
@@ -24,4 +28,7 @@ if [ -f ~/.bash_aliases ]; then
 fi
 
 export EDITOR="/usr/bin/vim"
+shopt -s checkwinsize
+
+export ANDROID_ADB_SERVER_PORT=15037
 

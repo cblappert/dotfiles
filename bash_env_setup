@@ -1,7 +1,10 @@
 #!/bin/bash
 # User specific environment and startup programs
 
+
+
 export PATH=$PATH:$HOME/bin
+
 # Nuclide
 export PATH=$PATH:/opt/facebook/nuclide/0.270.81972311/nuclide/pkg/nuclide-server/nuclide-start-server
 shopt -s checkwinsize

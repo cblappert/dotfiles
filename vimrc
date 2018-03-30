@@ -1,44 +1,121 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
-" Initialize VimPlug
-" ----------------------------------
-call plug#begin('~/.vim/bundle')
+let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
+" execute "set rtp+=" . g:opamshare . "/merlin/vim"
+" execute "helptags " . g:opamshare . "/merlin/vim/doc"
+
 " Vim Plug
+call plug#begin('~/.vim/plugged')
+" Plug 'kien/ctrlp.vim' >> not using
+" Plug 'vim-syntastic/syntastic' >> too slow
+" Plug 'craigemery/vim-autotag' >> not using tags
+" These are for flow but nothing gives flow types so will use nuclide instead
+" Plug 'flowtype/vim-flow'
+Plug 'pangloss/vim-javascript'
+Plug 'w0rp/ale'
 Plug 'bling/vim-airline'
 Plug 'altercation/vim-colors-solarized'
-Plug 'kien/ctrlp.vim'
 Plug 'vim-airline/vim-airline-themes'
-" Plug 'vim-syntastic/syntastic'
-Plug 'craigemery/vim-autotag'
-Plug 'flowtype/vim-flow'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'mbbill/undotree'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 call plug#end()
 
-
-" Now Perform The Installation Check:
-" ----------------------------------
-let everythingInstalled = !len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
-if everythingInstalled || 2==confirm("Download and Install Plugins (Restart Afterwards To Take Effect)?", "&Yes\n&No", 1)
-  " Place all the rest of your `~/.vimrc` config HERE!
-else
-  autocmd VimEnter *
-    \  if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
-    \|   PlugInstall --sync | echomsg "Restart Vim Now!" | let xx=confirm("Restart For Plugins to Take Effect.")
-    \| endif
+if filereadable("$LOCAL_ADMIN_SCRIPTS/master.vimrc")
+  source $LOCAL_ADMIN_SCRIPTS/master.vimrc
 endif
 
-let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
+let g:javascript_plugin_flow = 1
+augroup javascript_folding
+    au!
+    au FileType javascript setlocal foldmethod=syntax
+augroup END
+
+"
+" ==============================================================================
+" fzf biggrep setup -- use gs on word, ? for preview, <Enter> to open file
+"
+
+" This is the default extra key bindings
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit',
+  \ 'ctrl-b': 'badd' }
+
+" Default fzf layout
+let g:fzf_layout = { 'down': '~40%' }
+" Use preview with files
+command! -bang -nargs=? -complete=dir Files
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+" Mapping selecting mappings
+imap <c-x><c-l> <plug>(fzf-complete-line)
+nnoremap <c-x><c-t> :Files<CR>
+nnoremap <c-x><c-f> :BLines<CR>
+nnoremap <c-x><c-p> :Lines<CR>
+nnoremap <c-x><c-b> :Buffers<CR>
+
+let repo_path = system('hg root')
+let repo_initial = 'f'
+if repo_path =~# 'configerator'
+    let repo_initial = 'c'
+elseif repo_path =~# 'www'
+    let repo_initial = 't'
+elseif repo_path =~# 'fbcode'
+    let repo_initial = 'f'
+elseif repo_path =~# 'fbsource'
+    let repo_initial = 'x'
+endif
+
+command! -bang -nargs=* Bg
+  \ call fzf#vim#grep(
+  \   repo_initial . 'bgs --color=on '.shellescape(<q-args>) .
+  \ '| sed "s,^[^/]*/,,"' .
+  \ '| sed "s#^#$(hg root)/#g"', 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('up:55%:hidden', '?'),
+  \   <bang>0)
+noremap gs :Bg <C-r><C-w><CR>
+"
+" ==============================================================================
+" UndoTree Setup
+"
+if has("persistent_undo")
+  set undodir=~/.undodir/
+  set undofile
+endif
+"
+" ==============================================================================
+" ALE for flow
+"
+let g:ale_linters = {
+\   'javascript': ['eslint', 'flow'],
+\}
+let g:airline#extensions#ale#enabled = 1
+"
+" ==============================================================================
+" Ultisnips setup
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+"
+" ==============================================================================
+"
 
 " set colors
 syntax enable
 set background=dark
 colorscheme solarized
-
 " AirlineTheme solarized if refresh needed
 let g:airline_solarized_bg='dark'
 
 " Airline
 " show open buffers
+" let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#fnamemod = ':t'
 
 " ctrlp
 let g:ctrlp_match_window = 'bottom,order:ttb'
@@ -50,25 +127,32 @@ let g:ctrlp_custom_ignore = {
  \}
 
 " remap some keys
-nmap <leader>p :CtrlP<cr>
-nmap <leader>bb :CtrlPBuffer<cr>
-nmap <leader>bm :CtrlPMixed<cr>
-nmap <leader>bs :CtrlPMRU<cr>
+" nmap <leader>p :CtrlP<cr>
+" nmap <leader>bb :CtrlPBuffer<cr>
+" nmap <leader>bm :CtrlPMixed<cr>
+" nmap <leader>bs :CtrlPMRU<cr>
+
+nnoremap ; :
+" Navigation
 " Buffer remaps
 nnoremap <C-l> :bnext<CR>
 nnoremap <C-h> :bprevious<CR>
+nnoremap <C-k> :tabn<CR>
+nnoremap <C-j> :tabp<CR>
+nnoremap <silent> <Space> @=(foldlevel('.')?'za':"\<Space>")<CR>
+vnoremap <Space> zf
 nmap <leader>bq :bp <BAR> bd #<cr>
 
 " syntastic
-" set statusline+=%#warningmsg#
-" set statusline+=%{SyntasticStatuslineFlag()}
-" set statusline+=%*
-" let g:syntastic_javascript_checkers = ['eslint', 'flow']
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
+"let g:syntastic_javascript_checkers = ['eslint', 'flow']
 
-" let g:syntastic_always_populate_loc_list = 1
-" let g:syntastic_auto_loc_list = 1
-" let g:syntastic_check_on_open = 0
-" let g:syntastic_check_on_wq = 0
+"let g:syntastic_always_populate_loc_list = 1
+"let g:syntastic_auto_loc_list = 1
+"let g:syntastic_check_on_open = 0
+"let g:syntastic_check_on_wq = 0
 
 " tab config
 set shiftwidth=2 " the distance to shift text when using < and >
@@ -149,6 +233,7 @@ nnoremap gV `[v`]
 
 " always display the filename bar
 :set laststatus=2
+nmap <C-e> <C-w>
 
 " disable the audible warning bell
 :set visualbell
@@ -170,7 +255,6 @@ nnoremap gV `[v`]
 " :nmap K k
 
 " use control-e for changing windows, as well as control-w
-" :nmap <C-e> <C-w>
 
 " saves all buffers before a make. executes make silently -- that is, don't
 " prompt before re-entering the vim buffer. Because doing that messes up the
@@ -208,7 +292,7 @@ au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 au InsertLeave * match ExtraWhiteSpace /\s\+$/
 
 " make the 81st column dark gray
-set colorcolumn=81
+set colorcolumn=81,101
 highlight ColorColumn ctermbg=DarkGray
 
 " Only do this part when compiled with support for autocommands

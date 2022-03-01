@@ -35,9 +35,19 @@ prepack () {
   node --stack_size=10000 --stack_trace_limit=200 --max_old_space_size=8192 bin/prepack.js --compatibility jsc-600-1-4-17 --mathRandomSeed 0 --delayUnsupportedRequires "$@"
 }
 
+ppf_e2str () {
+  echo "$@" | tr '[:upper:]' '[:lower:]' | sed 's/__/::/g' | sed 's/^.*$/"&"/g'
+}
+
+underscore_pfh () {
+  echo "$@" | sed 's/ > /_/g' | pbcopy
+  # FB App > News Feed > Feed Unit > Pages You May Like Feed Unit
+}
+
 alias ls='ls -G'
 alias grep='grep -n --color'
 alias beep='echo -e "\a\a\a\a"'
+alias see_emulator='scrcpy'
 
 # Vi bindings
 set -o vi
